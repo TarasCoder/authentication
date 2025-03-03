@@ -1,0 +1,20 @@
+.center {
+  text-align: center;
+  text-transform: uppercase;
+  color: burlywood;
+  -webkit-text-stroke: 1pt #608b31;
+}
+.form_style {
+  display: flex;
+  flex-direction: column;
+  gap: 2;
+  padding: 2px;
+}
+
+.switch_status_block {
+  text-align: center;
+}
+.small_link {
+  color:blue !important;
+  cursor: pointer;
+}

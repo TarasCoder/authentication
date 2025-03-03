@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+}
+#root {
+  height: 100vh;
+  background-color: #b6c4a8;
+  background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
+}
+.centerIt {
+  padding-top: 200px;
+}
