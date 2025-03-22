@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button, Container, Box } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
@@ -6,10 +6,13 @@ import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import Input from "./Input";
+import Loading from "./Loading";
 import styles from "./Form.module.css";
 
 function Form() {
   const [IsRegistered, setStatus] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const [input, setInput] = useState({
     email: "",
@@ -17,6 +20,37 @@ function Form() {
   });
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        let token = Cookies.get("uuid");
+        if (token) {
+          const response = await axios.get(
+            import.meta.env.VITE_URL_TO_VALIDATE_SESSION,
+            {
+              headers: { uuid: token },
+            }
+          );
+          return response;
+        }
+        return null;
+      } catch (error) {
+        console.error("Error while validating session:", error);
+        return null;
+      }
+    };
+
+    checkSession().then((response) => {
+      if (response && response.status === 200) {
+        setIsLoading(true);
+        navigate("/secrets");
+      } else {
+        setIsLoading(false);
+        // navigate("/");
+      }
+    });
+  }, []);
 
   const sendData = async () => {
     if (IsRegistered) {
@@ -26,7 +60,8 @@ function Form() {
           password: input.password,
         });
         toast.success(response.data.message);
-        Cookies.set("auth", "true", { expires: 1 / 1440 });
+        let uuid_value = response.data.uuid;
+        Cookies.set("uuid", uuid_value, { expires: 1 / 24 }); // 1 hour cookie will be active
         navigate("/secrets");
       } catch (error) {
         toast.error(error.response.data.message);
@@ -41,7 +76,8 @@ function Form() {
           }
         );
         toast.success(response.data.message);
-        Cookies.set("auth", "true", { expires: 1 / 1440 });
+        let uuid_value = response.data.uuid;
+        Cookies.set("uuid", uuid_value, { expires: 1 / 24 }); // 1 hour cookie will be active
         navigate("/secrets");
       } catch (error) {
         toast.error(error.response.data.message);
@@ -75,6 +111,8 @@ function Form() {
     }
   }
 
+  if (isLoading) return <Loading />;
+
   return (
     <Container maxWidth="sm" className="centerIt">
       <Box
@@ -94,6 +132,7 @@ function Form() {
         />
         <Input
           label="Password"
+          type="password"
           value={input.password}
           handleInput={handleInput}
         />
